@@ -24,6 +24,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    processed_update (timepoint) {
+        timepoint -> Int4,
+        processed_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     subscription (id) {
         id -> Uuid,
         company_house_id -> Text,
@@ -35,5 +42,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     company,
     company_snapshot,
     notable_change,
+    processed_update,
     subscription,
 );

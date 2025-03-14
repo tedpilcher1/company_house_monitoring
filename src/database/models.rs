@@ -37,3 +37,11 @@ pub struct CompanySnapshot {
     pub company_house_id: String,
     pub snapshot_data: Value,
 }
+
+#[derive(Queryable, Selectable, Insertable)]
+#[diesel(table_name = crate::database::schema::processed_update)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct ProcessedUpdate {
+    pub timepoint: i32,
+    processed_at: NaiveDateTime,
+}
