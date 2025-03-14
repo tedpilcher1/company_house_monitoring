@@ -132,4 +132,24 @@ impl DatabaseClient {
 
         Ok(())
     }
+
+    pub fn get_company_snapshots(
+        &mut self,
+        company_house_id: String,
+        from_date: Option<NaiveDateTime>,
+        to_date: Option<NaiveDateTime>,
+    ) -> Result<Vec<CompanySnapshot>> {
+        let snapshots = company_snapshot::table
+            .filter(
+                company_snapshot::company_house_id.eq(company_house_id).and(
+                    company_snapshot::recieved_at
+                        .le(to_date.unwrap_or(Utc::now().naive_local()))
+                        .and(company_snapshot::recieved_at.ge(from_date.unwrap_or_default())),
+                ),
+            )
+            .select(company_snapshot::all_columns)
+            .get_results::<CompanySnapshot>(&mut self.conn)?;
+
+        Ok(snapshots)
+    }
 }
