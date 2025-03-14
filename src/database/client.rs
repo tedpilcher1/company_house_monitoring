@@ -11,7 +11,10 @@ use crate::database::{
     schema::{notable_change, subscription},
 };
 
-use super::models::NotableChange;
+use super::{
+    models::{Company, NotableChange},
+    schema::company,
+};
 
 pub struct DatabaseClient {
     conn: PgConnection,
@@ -69,5 +72,14 @@ impl DatabaseClient {
         Ok(())
     }
 
-    pub fn insert_company(&mut self, company_house_id: String) -> Result<()> {}
+    pub fn insert_company(&mut self, company_house_id: String) -> Result<()> {
+        insert_into(company::table)
+            .values(Company {
+                company_house_id,
+                first_monitored_at: Utc::now().naive_local(),
+            })
+            .execute(&mut self.conn)?;
+
+        Ok(())
+    }
 }
