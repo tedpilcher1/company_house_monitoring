@@ -19,6 +19,12 @@ pub struct CompanyHouseSDK {
     client: Client,
 }
 
+impl Default for CompanyHouseSDK {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompanyHouseSDK {
     pub fn new() -> Self {
         Self {
@@ -34,7 +40,7 @@ impl CompanyHouseSDK {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "Authorization",
-            header::HeaderValue::from_str(&format!("{}", API_KEY.as_str()))?,
+            header::HeaderValue::from_str(API_KEY.as_str())?,
         );
         let response = self.client.get(url).headers(headers).send().await?;
         let company_data: CompanyData = response.json().await?;
@@ -53,7 +59,7 @@ impl CompanyHouseSDK {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "Authorization",
-            header::HeaderValue::from_str(&format!("{}", API_KEY.as_str()))?,
+            header::HeaderValue::from_str(API_KEY.as_str())?,
         );
 
         Ok(self

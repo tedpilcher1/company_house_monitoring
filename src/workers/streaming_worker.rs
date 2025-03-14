@@ -48,7 +48,7 @@ impl StreamingWorker {
         let chunks: Vec<&[u8]> = bytes.split_inclusive(|byte| byte == &b'\n').collect();
         for chunk in chunks {
             // skip heartbeat
-            if chunk == &[10] {
+            if chunk == [10] {
                 println!("Skipping heartbeat");
                 continue;
             }
