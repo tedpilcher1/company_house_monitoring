@@ -43,5 +43,5 @@ pub struct CompanySnapshot {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ProcessedUpdate {
     pub timepoint: i32,
-    processed_at: NaiveDateTime,
+    pub processed_at: NaiveDateTime,
 }

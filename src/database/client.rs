@@ -12,8 +12,8 @@ use crate::database::{
 };
 
 use super::{
-    models::{Company, NotableChange},
-    schema::company,
+    models::{Company, NotableChange, ProcessedUpdate},
+    schema::{company, processed_update},
 };
 
 pub struct DatabaseClient {
@@ -80,6 +80,16 @@ impl DatabaseClient {
             })
             .execute(&mut self.conn)?;
 
+        Ok(())
+    }
+
+    pub fn insert_processed_update(&mut self, timepoint: i32) -> Result<()> {
+        insert_into(processed_update::table)
+            .values(ProcessedUpdate {
+                timepoint,
+                processed_at: Utc::now().naive_local(),
+            })
+            .execute(&mut self.conn)?;
         Ok(())
     }
 }
