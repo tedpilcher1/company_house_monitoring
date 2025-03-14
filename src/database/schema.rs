@@ -39,6 +39,10 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(company_snapshot -> company (company_house_id));
+diesel::joinable!(notable_change -> subscription (subscription_id));
+diesel::joinable!(subscription -> company (company_house_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
     company,
     company_snapshot,
