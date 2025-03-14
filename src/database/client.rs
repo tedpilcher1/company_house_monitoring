@@ -2,11 +2,16 @@ use anyhow::Result;
 use chrono::Utc;
 use diesel::{
     delete, dsl::insert_into, query_dsl::methods::FilterDsl, Connection, ExpressionMethods,
-    PgConnection, RunQueryDsl,
+    PgConnection, QueryResult, RunQueryDsl,
 };
 use uuid::Uuid;
 
-use crate::database::{models::Subscription, schema::subscription};
+use crate::database::{
+    models::Subscription,
+    schema::{notable_change, subscription},
+};
+
+use super::models::NotableChange;
 
 pub struct DatabaseClient {
     conn: PgConnection,
@@ -19,17 +24,33 @@ impl DatabaseClient {
         Ok(Self { conn })
     }
 
-    pub fn create_subscription(&mut self, company_house_id: String) -> Result<Uuid> {
+    pub fn create_subscription(
+        &mut self,
+        company_house_id: String,
+        notable_changes: Vec<String>,
+    ) -> Result<Uuid> {
         let id = Uuid::new_v4();
         let subscription = Subscription {
             id,
             company_house_id,
             created_at: Utc::now().naive_local(),
         };
+        self.conn.transaction(|conn| {
+            insert_into(subscription::table)
+                .values(subscription)
+                .execute(conn)?;
 
-        insert_into(subscription::table)
-            .values(subscription)
-            .execute(&mut self.conn)?;
+            for notable_change in notable_changes {
+                insert_into(notable_change::table)
+                    .values(NotableChange {
+                        id: Uuid::new_v4(),
+                        subscription_id: id,
+                        field: notable_change,
+                    })
+                    .execute(conn)?;
+            }
+            QueryResult::Ok(())
+        })?;
 
         Ok(id)
     }
