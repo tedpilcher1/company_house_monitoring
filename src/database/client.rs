@@ -1,9 +1,6 @@
 use anyhow::Result;
 use chrono::Utc;
-use diesel::{
-    delete, dsl::insert_into, query_dsl::methods::FilterDsl, Connection, ExpressionMethods,
-    PgConnection, QueryResult, RunQueryDsl,
-};
+use diesel::{delete, insert_into, prelude::*};
 use uuid::Uuid;
 
 use crate::database::{
@@ -91,5 +88,13 @@ impl DatabaseClient {
             })
             .execute(&mut self.conn)?;
         Ok(())
+    }
+
+    pub fn get_last_processed_timepoint(&mut self) -> Result<Option<i32>> {
+        Ok(processed_update::table
+            .order_by(processed_update::timepoint.desc())
+            .select(processed_update::timepoint)
+            .first::<i32>(&mut self.conn)
+            .optional()?)
     }
 }
