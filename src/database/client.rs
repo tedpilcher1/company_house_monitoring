@@ -1,6 +1,9 @@
 use anyhow::Result;
 use chrono::Utc;
-use diesel::{dsl::insert_into, Connection, PgConnection, RunQueryDsl};
+use diesel::{
+    delete, dsl::insert_into, query_dsl::methods::FilterDsl, Connection, ExpressionMethods,
+    PgConnection, RunQueryDsl,
+};
 use uuid::Uuid;
 
 use crate::database::{models::Subscription, schema::subscription};
@@ -29,5 +32,12 @@ impl DatabaseClient {
             .execute(&mut self.conn)?;
 
         Ok(id)
+    }
+
+    pub fn delete_subscription(&mut self, subscription_id: Uuid) -> Result<()> {
+        delete(subscription::table.filter(subscription::id.eq(subscription_id)))
+            .execute(&mut self.conn)?;
+
+        Ok(())
     }
 }
