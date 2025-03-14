@@ -103,23 +103,14 @@ impl DatabaseClient {
         company_house_id: &String,
         snapshot_data: Value,
     ) -> Result<()> {
-        self.conn.transaction(|conn| {
-            let result = company::table
-                .filter(company::company_house_id.eq(company_house_id))
-                .execute(conn)
-                .optional()?;
-
-            if result.is_some() {
-                insert_into(company_snapshot::table)
-                    .values(CompanySnapshot {
-                        id: Uuid::new_v4(),
-                        company_house_id: company_house_id.to_string(),
-                        snapshot_data,
-                    })
-                    .execute(conn)?;
-            }
-            QueryResult::Ok(())
-        })?;
+        insert_into(company_snapshot::table)
+            .values(CompanySnapshot {
+                id: Uuid::new_v4(),
+                company_house_id: company_house_id.to_string(),
+                snapshot_data,
+            })
+            .on_conflict_do_nothing()
+            .execute(&mut self.conn)?;
 
         Ok(())
     }
