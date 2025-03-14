@@ -1,3 +1,5 @@
+// @generated automatically by Diesel CLI.
+
 diesel::table! {
     company (company_house_id) {
         company_house_id -> Uuid,
@@ -6,10 +8,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    subscription (id) {
+    company_snapshot (id) {
         id -> Uuid,
         company_house_id -> Text,
-        created_at -> Timestamp,
+        snapshot_data -> Jsonb,
     }
 }
 
@@ -22,9 +24,16 @@ diesel::table! {
 }
 
 diesel::table! {
-    company_snapshot (id) {
+    subscription (id) {
         id -> Uuid,
         company_house_id -> Text,
-        snapshot_data -> Jsonb,
+        created_at -> Timestamp,
     }
 }
+
+diesel::allow_tables_to_appear_in_same_query!(
+    company,
+    company_snapshot,
+    notable_change,
+    subscription,
+);
