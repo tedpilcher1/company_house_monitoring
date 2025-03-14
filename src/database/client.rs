@@ -97,4 +97,12 @@ impl DatabaseClient {
             .first::<i32>(&mut self.conn)
             .optional()?)
     }
+
+    pub fn is_company_monitored(&mut self, company_house_id: String) -> Result<bool> {
+        let result = company::table
+            .filter(company::company_house_id.eq(company_house_id))
+            .execute(&mut self.conn)
+            .optional()?;
+        Ok(result.is_some())
+    }
 }
