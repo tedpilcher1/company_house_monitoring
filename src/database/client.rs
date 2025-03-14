@@ -29,12 +29,14 @@ impl DatabaseClient {
         &mut self,
         company_house_id: String,
         notable_changes: Vec<String>,
+        url: String,
     ) -> Result<Uuid> {
         let id = Uuid::new_v4();
         let subscription = Subscription {
             id,
             company_house_id,
             created_at: Utc::now().naive_local(),
+            url,
         };
         self.conn.transaction(|conn| {
             insert_into(subscription::table)

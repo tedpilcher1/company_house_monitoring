@@ -35,6 +35,7 @@ diesel::table! {
         id -> Uuid,
         company_house_id -> Text,
         created_at -> Timestamp,
+        url -> Text,
     }
 }
 

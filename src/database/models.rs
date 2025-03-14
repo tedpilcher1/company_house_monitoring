@@ -18,6 +18,7 @@ pub struct Subscription {
     pub id: Uuid,
     pub company_house_id: String,
     pub created_at: NaiveDateTime,
+    pub url: String,
 }
 
 #[derive(Queryable, Selectable, Insertable)]
