@@ -15,4 +15,21 @@ impl PulsarClient {
                 .expect("Should be able to create new pulsar client builder"),
         }
     }
+
+    pub async fn create_producer(&self, topic: &str) -> Producer<TokioExecutor> {
+        self.internal_client
+            .producer()
+            .with_topic(topic)
+            .with_options(producer::ProducerOptions {
+                schema: Some(proto::Schema {
+                    r#type: proto::schema::Type::String as i32, // Or appropriate type for Job
+                    ..Default::default()
+                }),
+
+                ..Default::default()
+            })
+            .build()
+            .await
+            .expect("Should be able to create producer")
+    }
 }
