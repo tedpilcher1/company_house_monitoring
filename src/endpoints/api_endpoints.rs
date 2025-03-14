@@ -1,7 +1,13 @@
-use actix_web::{delete, put, web, HttpResponse, Responder};
+use actix_web::{
+    delete, get, put,
+    web::{self},
+    HttpResponse, Responder,
+};
 use uuid::Uuid;
 
 use crate::endpoints::{AppState, SubscribeRequest};
+
+use super::DateRange;
 
 #[put("/subscribe/{company_house_id}")]
 async fn subscribe_endpoint(
@@ -34,5 +40,31 @@ async fn unsubscribe_endpoint(
             Err(_) => HttpResponse::NotFound().finish(),
         };
     }
+    HttpResponse::InternalServerError().finish()
+}
+
+#[get("/company_snapshots{company_house_id}")]
+async fn company_snapshots_endpoint(
+    company_house_id: web::Path<String>,
+    state: web::Data<AppState>,
+    query: web::Query<DateRange>,
+) -> impl Responder {
+    let date_range = query.into_inner();
+
+    if date_range.from_date > date_range.to_date {
+        return HttpResponse::BadRequest().finish();
+    }
+
+    if let Ok(mut database) = state.database.lock() {
+        return match database.get_company_snapshots(
+            company_house_id.to_string(),
+            date_range.from_date,
+            date_range.to_date,
+        ) {
+            Ok(snapshots) => HttpResponse::Ok().json(snapshots),
+            Err(_) => HttpResponse::NotFound().finish(),
+        };
+    }
+
     HttpResponse::InternalServerError().finish()
 }

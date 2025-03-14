@@ -4,7 +4,7 @@ use actix_web::{App, HttpServer};
 use company_house_monitoring::{
     database::client::DatabaseClient,
     endpoints::{
-        api_endpoints::{subscribe_endpoint, unsubscribe_endpoint},
+        api_endpoints::{company_snapshots_endpoint, subscribe_endpoint, unsubscribe_endpoint},
         AppState,
     },
 };
@@ -22,6 +22,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_state.clone())
             .service(subscribe_endpoint)
             .service(unsubscribe_endpoint)
+            .service(company_snapshots_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

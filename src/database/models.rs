@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable, Selectable};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -30,7 +31,7 @@ pub struct NotableChange {
     pub field: String,
 }
 
-#[derive(Queryable, Selectable, Insertable)]
+#[derive(Queryable, Selectable, Insertable, Deserialize, Serialize)]
 #[diesel(table_name = crate::database::schema::company_snapshot)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CompanySnapshot {
