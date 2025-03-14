@@ -6,8 +6,8 @@ use uuid::Uuid;
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::database::schema::company)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct ProcessedUpdate {
-    pub company_house_id: Uuid,
+pub struct Company {
+    pub company_house_id: String,
     pub first_monitored_at: NaiveDateTime,
 }
 

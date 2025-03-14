@@ -2,7 +2,7 @@
 
 diesel::table! {
     company (company_house_id) {
-        company_house_id -> Uuid,
+        company_house_id -> Text,
         first_monitored_at -> Timestamp,
     }
 }

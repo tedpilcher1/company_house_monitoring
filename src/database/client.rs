@@ -68,4 +68,6 @@ impl DatabaseClient {
 
         Ok(())
     }
+
+    pub fn insert_company(&mut self, company_house_id: String) -> Result<()> {}
 }

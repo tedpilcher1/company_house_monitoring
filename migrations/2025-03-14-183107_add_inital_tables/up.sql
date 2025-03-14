@@ -1,6 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE "company"(
-	"company_house_id" UUID NOT NULL PRIMARY KEY,
+	"company_house_id" TEXT NOT NULL PRIMARY KEY,
 	"first_monitored_at" TIMESTAMP NOT NULL
 );
 
