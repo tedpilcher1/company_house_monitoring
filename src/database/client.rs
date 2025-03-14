@@ -56,8 +56,15 @@ impl DatabaseClient {
     }
 
     pub fn delete_subscription(&mut self, subscription_id: Uuid) -> Result<()> {
-        delete(subscription::table.filter(subscription::id.eq(subscription_id)))
-            .execute(&mut self.conn)?;
+        self.conn.transaction(|conn| {
+            delete(
+                notable_change::table.filter(notable_change::subscription_id.eq(subscription_id)),
+            )
+            .execute(conn)?;
+            delete(subscription::table.filter(subscription::id.eq(subscription_id)))
+                .execute(conn)?;
+            QueryResult::Ok(())
+        })?;
 
         Ok(())
     }
