@@ -1,6 +1,7 @@
 use anyhow::Result;
 use chrono::Utc;
 use diesel::{delete, insert_into, prelude::*};
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::database::{
@@ -9,8 +10,8 @@ use crate::database::{
 };
 
 use super::{
-    models::{Company, NotableChange, ProcessedUpdate},
-    schema::{company, processed_update},
+    models::{Company, CompanySnapshot, NotableChange, ProcessedUpdate},
+    schema::{company, company_snapshot, processed_update},
 };
 
 pub struct DatabaseClient {
@@ -98,11 +99,29 @@ impl DatabaseClient {
             .optional()?)
     }
 
-    pub fn is_company_monitored(&mut self, company_house_id: String) -> Result<bool> {
-        let result = company::table
-            .filter(company::company_house_id.eq(company_house_id))
-            .execute(&mut self.conn)
-            .optional()?;
-        Ok(result.is_some())
+    pub fn insert_company_snapshot(
+        &mut self,
+        company_house_id: &String,
+        snapshot_data: Value,
+    ) -> Result<()> {
+        self.conn.transaction(|conn| {
+            let result = company::table
+                .filter(company::company_house_id.eq(company_house_id))
+                .execute(conn)
+                .optional()?;
+
+            if result.is_some() {
+                insert_into(company_snapshot::table)
+                    .values(CompanySnapshot {
+                        id: Uuid::new_v4(),
+                        company_house_id: company_house_id.to_string(),
+                        snapshot_data,
+                    })
+                    .execute(conn)?;
+            }
+            QueryResult::Ok(())
+        })?;
+
+        Ok(())
     }
 }
