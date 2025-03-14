@@ -34,11 +34,19 @@ impl DatabaseClient {
         let id = Uuid::new_v4();
         let subscription = Subscription {
             id,
-            company_house_id,
+            company_house_id: company_house_id.clone(),
             created_at: Utc::now().naive_local(),
             url,
         };
         self.conn.transaction(|conn| {
+            insert_into(company::table)
+                .values(Company {
+                    company_house_id,
+                    first_monitored_at: Utc::now().naive_local(),
+                })
+                .on_conflict_do_nothing()
+                .execute(conn)?;
+
             insert_into(subscription::table)
                 .values(subscription)
                 .execute(conn)?;
@@ -68,17 +76,6 @@ impl DatabaseClient {
                 .execute(conn)?;
             QueryResult::Ok(())
         })?;
-
-        Ok(())
-    }
-
-    pub fn insert_company(&mut self, company_house_id: String) -> Result<()> {
-        insert_into(company::table)
-            .values(Company {
-                company_house_id,
-                first_monitored_at: Utc::now().naive_local(),
-            })
-            .execute(&mut self.conn)?;
 
         Ok(())
     }
