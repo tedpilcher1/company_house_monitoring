@@ -37,6 +37,7 @@ pub struct CompanySnapshot {
     pub id: Uuid,
     pub company_house_id: String,
     pub snapshot_data: Value,
+    pub recieved_at: NaiveDateTime,
 }
 
 #[derive(Queryable, Selectable, Insertable)]

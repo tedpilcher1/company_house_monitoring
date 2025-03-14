@@ -12,6 +12,7 @@ diesel::table! {
         id -> Uuid,
         company_house_id -> Text,
         snapshot_data -> Jsonb,
+        recieved_at -> Timestamp,
     }
 }
 

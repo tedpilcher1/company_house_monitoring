@@ -1,5 +1,5 @@
 use anyhow::Result;
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*};
 use serde_json::Value;
 use uuid::Uuid;
@@ -125,6 +125,7 @@ impl DatabaseClient {
                 id: Uuid::new_v4(),
                 company_house_id: company_house_id.to_string(),
                 snapshot_data,
+                recieved_at: Utc::now().naive_local(),
             })
             .on_conflict_do_nothing()
             .execute(&mut self.conn)?;
