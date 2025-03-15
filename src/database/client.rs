@@ -119,18 +119,32 @@ impl DatabaseClient {
         &mut self,
         company_house_id: &String,
         snapshot_data: Value,
-    ) -> Result<()> {
-        insert_into(company_snapshot::table)
-            .values(CompanySnapshot {
-                id: Uuid::new_v4(),
-                company_house_id: company_house_id.to_string(),
-                snapshot_data,
-                recieved_at: Utc::now().naive_local(),
-            })
-            .on_conflict_do_nothing()
-            .execute(&mut self.conn)?;
+    ) -> Result<Option<String>> {
+        let company = self.conn.transaction(|conn| {
+            let company = company::table
+                .filter(company::company_house_id.eq(company_house_id))
+                .select(company::all_columns)
+                .get_result::<Company>(conn)
+                .optional()?;
 
-        Ok(())
+            if company.is_some() {
+                insert_into(company_snapshot::table)
+                    .values(CompanySnapshot {
+                        id: Uuid::new_v4(),
+                        company_house_id: company_house_id.to_string(),
+                        snapshot_data,
+                        recieved_at: Utc::now().naive_local(),
+                    })
+                    .execute(conn)?;
+            }
+
+            QueryResult::Ok(company)
+        })?;
+
+        match company {
+            Some(company) => Ok(Some(company.company_house_id)),
+            None => Ok(None),
+        }
     }
 
     pub fn get_company_snapshots(
