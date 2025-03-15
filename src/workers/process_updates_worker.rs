@@ -11,7 +11,7 @@ use pulsar::{consumer::Message, Consumer, Producer, SubType, TokioExecutor};
 
 use super::streaming_worker::COMPANY_STREAMING_TOPIC;
 
-const NOTIFICATION_TOPIC: &str = "non-persistent://public/default/notification-topic";
+pub const NOTIFICATION_TOPIC: &str = "non-persistent://public/default/notification-topic";
 const SUB: &str = "monitored-update-sub";
 const SUB_TYPE: SubType = SubType::Shared;
 
