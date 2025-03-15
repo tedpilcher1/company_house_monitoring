@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*};
 use serde_json::Value;
@@ -165,5 +165,48 @@ impl DatabaseClient {
             .get_results::<CompanySnapshot>(&mut self.conn)?;
 
         Ok(snapshots)
+    }
+
+    pub fn get_company_subscriptions(
+        &mut self,
+        company_house_id: &String,
+    ) -> Result<Vec<Subscription>> {
+        let subscriptions = subscription::table
+            .filter(subscription::company_house_id.eq(company_house_id))
+            .select(subscription::all_columns)
+            .get_results::<Subscription>(&mut self.conn)?;
+
+        Ok(subscriptions)
+    }
+
+    pub fn get_last_two_company_snapshots(
+        &mut self,
+        company_house_id: &String,
+    ) -> Result<(CompanySnapshot, CompanySnapshot)> {
+        let snapshots = company_snapshot::table
+            .filter(company_snapshot::company_house_id.eq(company_house_id))
+            .order_by(company_snapshot::recieved_at.desc())
+            .select(company_snapshot::all_columns)
+            .get_results::<CompanySnapshot>(&mut self.conn)?;
+
+        let num_snapshots = snapshots.len();
+
+        if num_snapshots < 2 {
+            bail!("Less than 2 snapshots")
+        }
+
+        let second_last_snapshot = snapshots.get(num_snapshots - 2).unwrap().clone();
+        let last_snapshot = snapshots.get(num_snapshots - 1).unwrap().clone();
+
+        Ok((second_last_snapshot, last_snapshot))
+    }
+
+    pub fn get_notable_changes(&mut self, subscription_id: &Uuid) -> Result<Vec<NotableChange>> {
+        let notable_changes = notable_change::table
+            .filter(notable_change::subscription_id.eq(subscription_id))
+            .select(notable_change::all_columns)
+            .get_results::<NotableChange>(&mut self.conn)?;
+
+        Ok(notable_changes)
     }
 }

@@ -31,7 +31,7 @@ pub struct NotableChange {
     pub field: String,
 }
 
-#[derive(Queryable, Selectable, Insertable, Deserialize, Serialize)]
+#[derive(Queryable, Selectable, Insertable, Deserialize, Serialize, Clone)]
 #[diesel(table_name = crate::database::schema::company_snapshot)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CompanySnapshot {
