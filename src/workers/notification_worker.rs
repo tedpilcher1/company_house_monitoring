@@ -64,7 +64,9 @@ impl NotificationWorker {
 
         for subscription in &subscriptions {
             if let Ok(notable_changes) = self.database.get_notable_changes(&subscription.id) {
-                if self.contains_notable_change(notable_changes, &fields_diff) {
+                if notable_changes.len() == 0
+                    || self.contains_notable_change(notable_changes, &fields_diff)
+                {
                     let _ = self
                         .client
                         .post(&subscription.url)
