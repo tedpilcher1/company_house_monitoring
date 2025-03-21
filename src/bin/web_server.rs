@@ -8,9 +8,11 @@ use company_house_monitoring::{
         AppState,
     },
 };
+use dotenv::dotenv;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
     let app_state = AppState {
         database: Arc::new(Mutex::new(
             DatabaseClient::new().expect("Should be able to connect to db"),
