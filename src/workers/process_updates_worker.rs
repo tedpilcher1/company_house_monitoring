@@ -41,6 +41,7 @@ impl ProcessUpdatesWorker {
             .await
             .expect("Should be able to wait for new message.")
         {
+            println!("Recieved new message");
             match self.process_message(&msg).await {
                 Ok(_) => {
                     self.consumer
@@ -62,10 +63,13 @@ impl ProcessUpdatesWorker {
         let update = update_event.data;
         let company_house_id = update.company_number.clone();
 
+        println!("Attempting to save new snapshot");
+
         if let Some(company_house_id) = self
             .database
             .insert_company_snapshot(&company_house_id, serde_json::to_value(update)?)?
         {
+            println!("Producing notification event");
             let _ = self
                 .notification_producer
                 .send_non_blocking(NotificationEvent::new(company_house_id))

@@ -31,6 +31,8 @@ impl StreamingWorker {
             .await
             .expect("Should be able to connect to company update stream");
 
+        println!("Connected to stream");
+
         let mut buffer: Vec<Vec<u8>> = Vec::new();
         while let Some(bytes_result) = stream.next().await {
             if let Ok(bytes) = bytes_result {
@@ -71,6 +73,7 @@ impl StreamingWorker {
         };
 
         if let Some(update_event) = update_event {
+            println!("Producing update event");
             self.update_event_producer
                 .send_non_blocking(update_event)
                 .await?;
