@@ -64,7 +64,7 @@ impl NotificationWorker {
 
         for subscription in &subscriptions {
             if let Ok(notable_changes) = self.database.get_notable_changes(&subscription.id) {
-                if notable_changes.len() == 0
+                if notable_changes.is_empty()
                     || self.contains_notable_change(notable_changes, &fields_diff)
                 {
                     let _ = self
